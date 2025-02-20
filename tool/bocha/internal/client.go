@@ -45,7 +45,7 @@ func New(apiKey string, count uint, debug bool) *Client {
 }
 
 func (s *Client) Search(ctx context.Context, query string) (string, error) {
-	r := resty.New().R().SetDebug(s.debug)
+	r := resty.New().R().SetDebug(s.debug).SetContext(ctx)
 	webRes := new(BochaResp)
 	resp, err := r.SetHeader("Authorization", "Bearer "+s.apiKey).
 		SetHeader("Content-Type", "application/json").
