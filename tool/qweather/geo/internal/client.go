@@ -20,8 +20,14 @@ var (
 type Resp struct {
 	Code     string     `json:"code"`
 	Location []Location `json:"location"`
+	Error    *Errors    `json:"error"`
 }
-
+type Errors struct {
+	Status int    `json:"status"`
+	Type   string `json:"type"`
+	Title  string `json:"title"`
+	Detail string `json:"detail"`
+}
 type Location struct {
 	Name    string `json:"name"`
 	ID      string `json:"id"`
@@ -68,6 +74,9 @@ func (s *Client) Search(ctx context.Context, query string) (string, error) {
 
 	if resp.StatusCode() != 200 {
 		return "", errors.New("search in q-geo api, status code: " + strconv.Itoa(resp.StatusCode()))
+	}
+	if webRes.Error != nil {
+		return "", errors.New("error from q-geo API: {" + webRes.Error.Title + ":" + webRes.Error.Detail + "}")
 	}
 	if webRes.Code != "200" {
 		return "", errors.New("error from q-geo API: {" + resp.String() + "or 'Unknown error'}")
