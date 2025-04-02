@@ -66,7 +66,9 @@ func (s *Client) Search(ctx context.Context, query string) (string, error) {
 	}
 	r := resty.New().R().SetDebug(s.debug).SetContext(ctx)
 	webRes := new(Resp)
-	resp, err := r.SetHeader("X-QW-Api-Key", s.apiKey).SetHeader("User-Agent", "ext").
+	resp, err := r.SetHeader("X-QW-Api-Key", s.apiKey).
+		SetHeader("User-Agent", "ext").
+		SetResult(webRes).
 		Get(requestUri)
 	if err != nil {
 		return "", fmt.Errorf("search in q-geo api: %w", err)

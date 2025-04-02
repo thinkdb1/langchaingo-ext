@@ -1,9 +1,9 @@
-package geo
+package weather
 
 import (
 	"context"
 	"errors"
-	"github.com/thinkdb1/langchaingo-ext/tool/qweather/geo/internal"
+	"github.com/thinkdb1/langchaingo-ext/tool/qweather/weather/internal"
 	"github.com/tmc/langchaingo/callbacks"
 	"github.com/tmc/langchaingo/tools"
 	"os"
@@ -31,34 +31,38 @@ func New(opts ...Option) (*Tool, error) {
 	if Opts.apiKey == "" {
 		return nil, ErrMissingToken
 	}
-	if Opts.number == 0 {
-		Opts.number = 5
-	}
-	if Opts.number > 10 {
-		Opts.number = 10
+	if Opts.unit == "" {
+		Opts.unit = "m"
 	}
 
 	return &Tool{
-		client: internal.New(Opts.apiKey, Opts.debug, Opts.number, Opts.lang),
+		client: internal.New(Opts.apiKey, Opts.debug, Opts.unit, Opts.lang),
 	}, nil
 }
 
 func (t Tool) Name() string {
-	return "q-geo"
+	return "q-weather"
 }
 
 func (t Tool) Description() string {
 	return `
-	使用q-geo API 进行城市经纬度搜索搜索，输入：省份/城市，省份城市之间需要使用“/”分隔。
-	返回：
+	使用q-weather API 进行城市天气搜索搜索，输入：longitude,latitude，经纬度间使用“,”分隔。
+	返回：天气信息列表,
 	[{
-      "name":"城市",
-      "lat":"纬度",
-      "lon":"经度",
-      "adm2":"所属上级行政区划",
-      "adm1":"所属一级行政区域",
-      "country":"国家",
-      "tz":"所在时区",
+		fxDate: 日期,
+		sunrise: 日升时间,
+		sunset: 日落时间,
+		tempMax: 最高温度,
+		tempMin: 最低温度,
+		textDay: 白天天气状况文字描述，包括阴晴雨雪等天气状态的描述,
+		textNight: 晚间天气状况文字描述，包括阴晴雨雪等天气状态的描述,
+		windDirDay: 白天风向
+		windScaleDay: 白天风力等级
+		windDirNight:夜间当天风向
+		windScaleNight: 夜间风力等级
+		humidity: 相对湿度，百分比数值
+		vis: 能见度，默认单位：公里
+		uvIndex: 紫外线强度指数   		
 }]
 `
 }
@@ -71,7 +75,7 @@ func (t Tool) Call(ctx context.Context, input string) (string, error) {
 	result, err := t.client.Search(ctx, input)
 	if err != nil {
 		if errors.Is(err, internal.ErrNoGoodResult) {
-			return "No q-geo Search Results was found", nil
+			return "No q-weather Search Results was found", nil
 		}
 
 		if t.CallbacksHandler != nil {
