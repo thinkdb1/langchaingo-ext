@@ -54,6 +54,7 @@ type DailyItem struct {
 	Precip   string `json:"precip"`
 	Pressure string `json:"pressure"`
 	Vis      string `json:"vis"`
+	CityName string `json:"cityName"`
 }
 
 type Client struct {
@@ -72,20 +73,22 @@ func New(apiKey string, debug bool, uint string, lang string) *Client {
 	}
 }
 
+type request struct {
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
+	City      string  `json:"city"`
+}
+
 func (s *Client) Search(ctx context.Context, query string) (string, error) {
-	qList := strings.Split(query, ",")
-	if len(qList) != 2 {
-		return "", errors.New("query Must follow 'longitude/latitude' ；Longitude and latitude are floating point numbers ；like 116.41,39.92")
+	query = strings.Replace(query, "`", "", -1)
+	query = strings.Replace(query, "json", "", 1)
+	query = strings.TrimSpace(query)
+	req := new(request)
+	if err := json.Unmarshal([]byte(query), req); err != nil {
+		return "", fmt.Errorf("q-weather query to struct err: %w", err)
 	}
-	lon, err := strconv.ParseFloat(qList[0], 64)
-	if err != nil {
-		return "", errors.New("query Must follow 'longitude/latitude' ；Longitude and latitude are floating point numbers ； like 116.41,39.92")
-	}
-	lat, err := strconv.ParseFloat(qList[1], 64)
-	if err != nil {
-		return "", errors.New("query Must follow 'longitude/latitude' ；Longitude and latitude are floating point numbers ； like 116.41,39.92")
-	}
-	requestUri := fmt.Sprintf(_url+"location=%.2f,%.2f&unit=%s", lon, lat, s.uint)
+
+	requestUri := fmt.Sprintf(_url+"location=%.2f,%.2f&unit=%s", req.Longitude, req.Latitude, s.uint)
 	if s.lang != "" {
 		requestUri += "&lang=" + s.lang
 	}
@@ -112,8 +115,13 @@ func (s *Client) Search(ctx context.Context, query string) (string, error) {
 	if webRes.Daily == nil {
 		return "", ErrNoGoodResult
 	}
+	dayList := make([]DailyItem, 0, len(webRes.Daily))
+	for _, v := range webRes.Daily {
+		v.CityName = req.City
+		dayList = append(dayList, v)
+	}
 	buf := new(strings.Builder)
-	if err := json.NewEncoder(buf).Encode(webRes.Daily); err != nil {
+	if err := json.NewEncoder(buf).Encode(dayList); err != nil {
 		return "", err
 	}
 	return buf.String(), nil

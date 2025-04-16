@@ -49,17 +49,18 @@ func (t Tool) Name() string {
 
 func (t Tool) Description() string {
 	return `
-	使用q-geo API 进行城市经纬度搜索搜索，输入：省份/城市，省份城市之间需要使用“/”分隔。
-	返回：
+	Use the q-geo API to perform a city latitude and longitude search.
+Input format: Province/City — the province and city must be separated by a “/” character.
+Return format:
 	[{
-      "name":"城市",
-      "lat":"纬度",
-      "lon":"经度",
-      "adm2":"所属上级行政区划",
-      "adm1":"所属一级行政区域",
-      "country":"国家",
-      "tz":"所在时区",
-}]
+    "name": "City",
+    "lat": "Latitude",
+    "lon": "Longitude",
+    "adm2": "Subordinate administrative division",
+    "adm1": "Primary administrative region",
+    "country": "Country",
+    "tz": "Time zone"
+  }]
 `
 }
 

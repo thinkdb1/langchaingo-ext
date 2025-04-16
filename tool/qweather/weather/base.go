@@ -46,24 +46,29 @@ func (t Tool) Name() string {
 
 func (t Tool) Description() string {
 	return `
-	使用q-weather API 进行城市天气搜索搜索，输入：longitude,latitude，经纬度间使用“,”分隔。
-	返回：天气信息列表,
-	[{
-		fxDate: 日期,
-		sunrise: 日升时间,
-		sunset: 日落时间,
-		tempMax: 最高温度,
-		tempMin: 最低温度,
-		textDay: 白天天气状况文字描述，包括阴晴雨雪等天气状态的描述,
-		textNight: 晚间天气状况文字描述，包括阴晴雨雪等天气状态的描述,
-		windDirDay: 白天风向
-		windScaleDay: 白天风力等级
-		windDirNight:夜间当天风向
-		windScaleNight: 夜间风力等级
-		humidity: 相对湿度，百分比数值
-		vis: 能见度，默认单位：公里
-		uvIndex: 紫外线强度指数   		
-}]
+	Use the q-weather API to perform a city weather search.
+Input is a json Serialized multiple strings: .
+"{\"longitude\":10.111,\"latitude\":10.111,\"city\":\"city name for search\"}"
+
+Return: A list of weather information
+	[
+  {
+    "fxDate": "Date",
+    "sunrise": "Sunrise time",
+    "sunset": "Sunset time",
+    "tempMax": "Maximum temperature",
+    "tempMin": "Minimum temperature",
+    "textDay": "Daytime weather description, including conditions such as sunny, cloudy, rainy, snowy, etc.",
+    "textNight": "Nighttime weather description, including conditions such as sunny, cloudy, rainy, snowy, etc.",
+    "windDirDay": "Daytime wind direction",
+    "windScaleDay": "Daytime wind scale level",
+    "windDirNight": "Nighttime wind direction",
+    "windScaleNight": "Nighttime wind scale level",
+    "humidity": "Relative humidity in percentage",
+    "vis": "Visibility in kilometers (default unit)",
+    "uvIndex": "UV index"
+  }
+]
 `
 }
 
