@@ -112,7 +112,6 @@ func (a *ConcurrentAgent) Plan(
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("@@@@output:", output)
 	return a.parseOutput(output)
 }
 
